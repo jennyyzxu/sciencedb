@@ -4,7 +4,7 @@
 \alias{sdb_search}
 \title{Search ScienceDB Datasets by Keyword}
 \usage{
-sdb_search(keyword = NULL)
+sdb_search(keyword = "")
 }
 \arguments{
 \item{keyword}{A character string specifying the search query or topic (e.g., 'personality', 'economics'). Default is 'NULL', which returns top default results.}

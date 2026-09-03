@@ -12,7 +12,7 @@ sdb_download(doi, user_path)
 \item{user_path}{A character string specifying the local directory path where downloaded files will be saved.}
 }
 \value{
-Invisible. Files are saved directly to the specified user path.
+Messages informing users the number of files saved successfully to the specified user path.
 }
 \description{
 Download All Dataset Files to Local Directory by DOI

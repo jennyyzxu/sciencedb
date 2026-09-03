@@ -29,10 +29,6 @@ You can install the development version of sciencedb from
 # Recommended (fast installer)
 # install.packages("pak")
 pak::pak("jennyyzxu/sciencedb")
-
-# Alternative
-# install.packages("devtools")
-devtools::install_github("jennyyzxu/sciencedb")
 ```
 
 ## Example

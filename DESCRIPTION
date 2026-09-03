@@ -1,5 +1,5 @@
 Package: sciencedb
-Title: R Client for the ScienceDB Open Data Repository
+Title: Search, Inspect, and Download Data from ScienceDB
 Version: 0.0.0.9000
 Authors@R: 
     person("Jenny", "Xu", , "jennyyzxu@gmail.com", role = c("aut", "cre"))

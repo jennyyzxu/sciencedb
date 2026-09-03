@@ -82,7 +82,7 @@ library(sciencedb)
 # Search for datasets related to attachment
 results <- sdb_search(keyword = "attachment")
 
-# Preview core metadata columns for the top 3 results
+# Preview core metadata columns 
 head(results)
 ```
 
@@ -96,8 +96,8 @@ head(results)
 # Retreive full metadata and file information for a specific dataset
 info <- sdb_dive(doi = "10.57760/sciencedb.o00115.00098")
 
-# Preview taxonomy
-info[[1]]$taxonomy
+# Preview dataset-relevant research paper
+info[[1]]$papers
 ```
 
 3.  **Download Files**

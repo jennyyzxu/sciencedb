@@ -67,7 +67,7 @@ library(sciencedb)
 # Search for datasets related to attachment
 results <- sdb_search(keyword = "attachment")
 
-# Preview core metadata columns for the top 3 results
+# Preview core metadata columns 
 head(results)
 #>                                                                                                     Title
 #> 1                                                                             Article material attachment
@@ -117,7 +117,7 @@ head(results)
 #> 3 RESTRICTED   152         0        31253.11.sciencedb.41461
 #> 4     PUBLIC  5049         4   31253.11.sciencedb.lcbl.00043
 #> 5 RESTRICTED  3484         1        31253.11.sciencedb.12832
-#> 6     PUBLIC   299         3        31253.11.sciencedb.36564
+#> 6     PUBLIC   300         3        31253.11.sciencedb.36564
 ```
 
 2.  **Inspect Dataset Details**
@@ -130,17 +130,50 @@ head(results)
 # Retreive full metadata and file information for a specific dataset
 info <- sdb_dive(doi = "10.57760/sciencedb.o00115.00098")
 
-# Preview taxonomy
-info[[1]]$taxonomy
+# Preview dataset-relevant research paper
+info[[1]]$papers
 #> [[1]]
-#> [[1]]$code
-#> [1] "190"
+#> [[1]]$titleZh
+#> [1] "Attachment Style and Attention Bias to Emotional Information: The Moderating Effect of Stress, Stimulus Characteristics, and Attention Stage"
 #> 
-#> [[1]]$nameZh
-#> [1] "心理学"
+#> [[1]]$titleEn
+#> [1] "Attachment Style and Attention Bias to Emotional Information: The Moderating Effect of Stress, Stimulus Characteristics, and Attention Stage"
 #> 
-#> [[1]]$nameEn
-#> [1] "Psychology"
+#> [[1]]$doi
+#> [1] "10.1111/jopy.12891"
+#> 
+#> [[1]]$url
+#> [1] ""
+#> 
+#> [[1]]$citationFlag
+#> NULL
+#> 
+#> [[1]]$citationZh
+#> [1] ""
+#> 
+#> [[1]]$citationEn
+#> [1] ""
+#> 
+#> [[1]]$state
+#> [1] "published"
+#> 
+#> [[1]]$manuscriptNo
+#> [1] ""
+#> 
+#> [[1]]$journalZh
+#> [1] "Journal of Personality"
+#> 
+#> [[1]]$journalEn
+#> [1] "Journal of Personality"
+#> 
+#> [[1]]$journalCode
+#> [1] "o00115"
+#> 
+#> [[1]]$authors
+#> NULL
+#> 
+#> [[1]]$volume
+#> NULL
 ```
 
 3.  **Download Files**

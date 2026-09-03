@@ -3,7 +3,7 @@
 #' @param doi A character string specifying the DOI (e.g., "10.57760/sciencedb.15594").
 #' @param user_path A character string specifying the local directory path where downloaded files will be saved.
 #'
-#' @returns Invisible. Files are saved directly to the specified user path.
+#' @returns Messages informing users the number of files saved successfully to the specified user path.
 #'
 #' @importFrom httr2 request req_headers req_url_query req_body_json req_perform resp_body_json req_options req_timeout resp_header
 #' @export
@@ -27,6 +27,13 @@ sdb_download <- function(doi, user_path){
       'Accept-Language' = "en"
     ) |>
     httr2::req_perform()
+  
+  initial_status <- httr2::resp_status(initial_response)
+  if (initial_status %in% c(500, 502, 503, 504)){
+    stop(
+      "ScienceDB servers appear to be unreachable right now (HTTP ", initial_status, "). Please try again later."
+    )
+  }
 
   # =========================================================================
   # Step 2: Extract Cookies
@@ -113,7 +120,7 @@ sdb_download <- function(doi, user_path){
   datafiles_info <- get_terminal_files(current_path)
 
   # =========================================================================
-  # Step 5: Check file duplicates
+  # Step 5: Check File Duplicates 
   # =========================================================================
   rename <- function(destination_path){
     if(!file.exists(destination_path)){
@@ -138,9 +145,8 @@ sdb_download <- function(doi, user_path){
     return(destination_path)
   }
 
-
   # =========================================================================
-  # Step 6: Download All Data Files to User's File Directory
+  # Step 6: Check File Number & Access Condition
   # =========================================================================
   num_datafiles <- length(datafiles_info)
 
@@ -148,7 +154,15 @@ sdb_download <- function(doi, user_path){
     message("No files found to download for this dataset.")
     return(invisible(NULL))
   }
+  
+  access <- meta_info[[1]]$shareStatus
+  if (access %in% c("RESTRICTED", "EMBARGO")){
+    message("Notice: this dataset contains restricted or embargoed files. Some downloads may be unavailable.")
+  }
 
+  # =========================================================================
+  # Step 6: Download All Data Files to User's File Directory
+  # =========================================================================
   message(sprintf("Found %d file(s) to download.", num_datafiles))
 
   for (i in seq_along(datafiles_info)){
@@ -172,6 +186,16 @@ sdb_download <- function(doi, user_path){
       )|>
       httr2::req_timeout(3600) |>
       httr2::req_perform(path = destination)
+    
+    # =========================================================================
+    # Step 7: Handle Download Failure
+    # =========================================================================
+    status_code <- httr2::resp_status(download_res)
+    
+    if(status_code %in% c(500, 502, 503, 504)){
+      stop(
+        "ScienceDB server issue during download. Please try again later."
+      ) }
 
     Sys.sleep(1)
   }

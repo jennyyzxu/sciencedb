@@ -1,0 +1,17 @@
+Package: sciencedb
+Title: R Client for the ScienceDB Open Data Repository
+Version: 0.0.0.9000
+Authors@R: 
+    person("Jenny", "Xu", , "jennyyzxu@gmail.com", role = c("aut", "cre"))
+Description: Programmatic interface for ScienceDB (<https://www.scidb.cn/>). Provides functions to search dataset metadata, inspect raw JSON records, and download dataset files directly into local environments.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 8.0.0
+Imports: 
+    httr2
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/jennyyzxu/sciencedb
+BugReports: https://github.com/jennyyzxu/sciencedb/issues

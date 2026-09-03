@@ -1,0 +1,512 @@
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies
+) |>
+req_options(followlocation = FALSE) |>
+req_perform()
+status
+resp_status(response)
+location <- resp_header(response, "location")
+match <- regexec("[?&]dataSetId=([^&#]+)",
+location, ignore.case = TRUE)
+datasetID <- regmatches(location, match)[[1]][2]
+datasetID
+meta_info <- sdb_dive(doi)
+ver <- meta_info[[1]]$version
+current_path <- paste("/", ver, sep = "")
+current_path
+ver <- meta_info[[1]]$version
+ver
+meta_info
+View(meta_info)
+get_terminal_files <- function(path){
+sub_response <- request(
+"https://www.scidb.cn/api/gin-sdb-filetree/public/file/childrenFileListByPath"
+) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies,
+'Origin' = "https://www.scidb.cn",
+'Referer' = paste0("https://www.scidb.cn/en/detail?dataSetId=", datasetID)
+) |>
+req_body_json(
+list(
+dataSetId = datasetID,
+lastIndex = 0,
+pageSize = 2000,
+path = path,
+version = ver
+)
+) |>
+req_perform()
+top_level_files <- resp_body_json(sub_response)$data
+all_files <- list()
+# Recursion: R creates a brand new, independent copy of function while original copy wait for new copy to finish before resuming
+for (file in top_level_files){
+# Is this item a folder? (Yes)
+if (isTRUE(file$dir)){
+# Pause, launch a new request with subfolder path, and discover a list of files
+nested_files <- get_terminal_files(file$path)
+# Merge discovered files into master list
+all_files <- c(all_files, nested_files)
+# Is this item a folder? (No)
+} else {
+# Append sub-list containing datafile info
+all_files[[length(all_files) + 1]] <- list(
+file_id = file$id,
+file_path = file$path,
+file_name = file$fileName
+)
+}
+}
+return(all_files)
+}
+datafiles_info <- get_terminal_files(current_path)
+View(datafiles_info)
+current_path
+sdb_dive(doi)
+sdb_dive("10.57760/sciencedb.07816")
+View(info)
+user_agent <- "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
+initial_response <- request("https://www.scidb.cn/en") |>
+req_headers(
+'User-Agent' = user_agent,
+'Accept' = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+'Accept-Language' = "en"
+) |>
+req_perform()
+acw_cookies <- initial_response[["headers"]][[3]]
+acw <- sub(";.*$", "", acw_cookies)
+# (CDN) Content Delivery Network Security Traffic Cookie: authorize high-bandwidth data transfers
+cdn_cookies <- initial_response[["headers"]][[4]]
+cdn <- sub(";.*$", "", cdn_cookies)
+joint_cookies <- paste(acw, cdn, sep = "; ")
+doi_response <- request("https://www.scidb.cn/api/sdb-query-service/query") |>
+req_url_query(queryCode = "",
+q = doi) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie'     = joint_cookies,
+'Origin'     = "https://www.scidb.cn",
+'Referer'    = "https://www.scidb.cn/en/list",
+'Content-Type' = "application/json;charset=UTF-8"
+) |>
+req_body_json(list(
+copyrightCode=list(),
+dataSetStatus=list(),
+fileType=list(),
+journalNameEn=list(),
+ordernum="6",
+page = 1,
+publishDate=list(),
+ror="",
+rorId=list(),
+size= 1,
+taxonomyEn=list()
+)) |>
+req_perform()
+json <- resp_body_json(doi_response)
+raw_info <- json$data$data
+View(raw_info)
+doi <- "10.57760/sciencedb.07816"
+doi_response <- request("https://www.scidb.cn/api/sdb-query-service/query") |>
+req_url_query(queryCode = "", q = doi) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie'     = joint_cookies,
+'Origin'     = "https://www.scidb.cn",
+'Referer'    = "https://www.scidb.cn/en/list",
+'Content-Type' = "application/json;charset=UTF-8"
+) |>
+req_body_json(list(
+copyrightCode=list(),
+dataSetStatus=list(),
+fileType=list(),
+journalNameEn=list(),
+ordernum="6",
+page = 1,
+publishDate=list(),
+ror="",
+rorId=list(),
+size= 1,
+taxonomyEn=list()
+)) |>
+req_perform()
+doi_response
+datasetID
+doi_response <- request("https://www.scidb.cn/api/sdb-dataset--version-service/versionList") |>
+req_url_query(
+dataSetType = personal,
+datasetId = datasetID,
+mode = front) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie'     = joint_cookies,
+'Origin'     = "https://www.scidb.cn",
+'Referer'    = paste0("https://www.scidb.cn/en/detail?dataSetID=", datasetID),
+'Content-Type' = "application/json;charset=UTF-8"
+) |>
+req_perform()
+doi_response <- request("https://www.scidb.cn/api/sdb-dataset--version-service/versionList") |>
+req_url_query(
+dataSetType = "personal",
+datasetId = datasetID,
+mode = "front") |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie'     = joint_cookies,
+'Origin'     = "https://www.scidb.cn",
+'Referer'    = paste0("https://www.scidb.cn/en/detail?dataSetID=", datasetID)
+) |>
+req_perform()
+doi_response <- request("https://www.scidb.cn/api/sdb-dataset-version-service/versionList") |>
+req_url_query(
+dataSetType = "personal",
+dataSetId = datasetID,
+mode = "front") |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie'     = joint_cookies,
+'Origin'     = "https://www.scidb.cn",
+'Referer'    = paste0("https://www.scidb.cn/en/detail?dataSetID=", datasetID)
+) |>
+req_perform()
+json <- resp_body_json(doi_response)
+json
+raw_info <- json$data$data
+raw_info <- json$data$data
+View(match)
+View(json)
+json$data$list
+raw_info <- json$data$list
+View(raw_info)
+load_all()
+load_all()
+sdb_dive("10.57760/sciencedb.07816")
+load_all()
+sdb_dive("10.57760/sciencedb.07816")
+raw_info <- sdb_dive("10.57760/sciencedb.07816")
+View(raw_info)
+raw_info[[1]]$version
+meta_info <- sdb_dive(doi)
+ver <- meta_info[[1]]$version
+current_path <- paste("/", ver, sep = "")
+ver
+current_path
+get_terminal_files <- function(path){
+sub_response <- request(
+"https://www.scidb.cn/api/gin-sdb-filetree/public/file/childrenFileListByPath"
+) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies,
+'Origin' = "https://www.scidb.cn",
+'Referer' = paste0("https://www.scidb.cn/en/detail?dataSetId=", datasetID)
+) |>
+req_body_json(
+list(
+dataSetId = datasetID,
+lastIndex = 0,
+pageSize = 2000,
+path = path,
+version = ver
+)
+) |>
+req_perform()
+top_level_files <- resp_body_json(sub_response)$data
+all_files <- list()
+# Recursion: R creates a brand new, independent copy of function while original copy wait for new copy to finish before resuming
+for (file in top_level_files){
+# Is this item a folder? (Yes)
+if (isTRUE(file$dir)){
+# Pause, launch a new request with subfolder path, and discover a list of files
+nested_files <- get_terminal_files(file$path)
+# Merge discovered files into master list
+all_files <- c(all_files, nested_files)
+# Is this item a folder? (No)
+} else {
+# Append sub-list containing datafile info
+all_files[[length(all_files) + 1]] <- list(
+file_id = file$id,
+file_path = file$path,
+file_name = file$fileName
+)
+}
+}
+return(all_files)
+}
+datafiles_info <- get_terminal_files(current_path)
+View(datafiles_info)
+num_datafiles <- character(length(datafiles_info))
+for (i in seq_along(datafiles_info)){
+current_file <- datafiles_info[[i]]
+destination <- file.path(user_path, current_file$file_name)
+download_res <- request("https://download.scidb.cn/download") |>
+req_url_query(
+fileId = current_file$file_id,
+path = current_file$file_path,
+fileName = current_file$file_name
+) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies,
+'Origin' = "https://www.scidb.cn",
+'Referer' = paste0("https://www.scidb.cn/en/detail?dataSetId=", datasetID)
+)|>
+req_timeout(3600) |>
+req_perform(path = destination)
+Sys.sleep(1)
+}
+}
+load_all()
+sdb_download(doi = "10.57760/sciencedb.07816", user_path = "~/Desktop")
+sdb_download(doi = "10.57760/sciencedb.06399", user_path = "~/Desktop")
+sdb_download(doi = "10.57760/sciencedb.06399", user_path = "~/Desktop")
+sdb_download(doi = "10.57760/sciencedb.06399", user_path = "~/Desktop")
+destination_path <- "~/Desktop/data.csv"
+file.exists(destination_path)
+file.exists("~/Desktop/Measures.docx")
+dirname(destination_path)
+basename(destination_path)
+dir_name <- dirname(destination_path)
+file_name <- basename(destination_path)
+tools::file_ext(file_name)
+extension <- tools::file_ext(file_name)
+nzchar(extension)
+tools::file_path_sans_ext(file_name)
+extension <- tools::file_ext(file_name)
+extension_str <- if(nzchar(extension)) paste0(".", extension) else ""
+base_name <- tools::file_path_sans_ext(file_name)
+counter <- 1
+new_name <- sprintf("%s (%d)%s", base_name, counter, extension_str)
+new_name
+file.path(dir_name, new_name)
+destination_path <- file.path(dir_name, new_name)
+counter <- counter+1
+message(sprintf("File already exists. Saving as: %s", basename(destination_path)))
+new_name <- sprintf("%s(%d)%s", base_name, counter, extension_str)
+new_name
+rename <- function(destination_path){
+if(!file.exists(destination_path)){
+return(destination_path)
+}
+dir_name <- dirname(destination_path)
+file_name <- basename(destination_path)
+extension <- tools::file_ext(file_name)
+extension_str <- if(nzchar(extension)) paste0(".", extension) else ""
+base_name <- tools::file_path_sans_ext(file_name)
+counter <- 1
+while (file.exists(destination_path)){
+new_name <- sprintf("%s(%d)%s", base_name, counter, extension_str)
+destination_path <- file.path(dir_name, new_name)
+counter <- counter+1
+}
+message(sprintf("File already exists. Saving as: %s", basename(destination_path)))
+return(destination_path)
+}
+user_agent <- "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
+initial_response <- request("https://www.scidb.cn/en") |>
+req_headers(
+'User-Agent' = user_agent,
+'Accept' = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+'Accept-Language' = "en"
+) |>
+req_perform()
+acw_cookies <- initial_response[["headers"]][[3]]
+acw <- sub(";.*$", "", acw_cookies)
+# (CDN) Content Delivery Network Security Traffic Cookie: authorize high-bandwidth data transfers
+cdn_cookies <- initial_response[["headers"]][[4]]
+cdn <- sub(";.*$", "", cdn_cookies)
+joint_cookies <- paste(acw, cdn, sep = "; ")
+doi <- "10.57760/sciencedb.07816"
+response <- request(paste0("https://doi.org/", doi)) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies
+) |>
+req_options(followlocation = FALSE) |>
+req_perform()
+status <- resp_status(response)
+location <- resp_header(response, "location")
+match <- regexec("[?&]dataSetId=([^&#]+)",
+location, ignore.case = TRUE)
+datasetID <- regmatches(location, match)[[1]][2]
+datasetID
+meta_info <- sdb_dive(doi)
+ver <- meta_info[[1]]$version
+current_path <- paste("/", ver, sep = "")
+get_terminal_files <- function(path){
+sub_response <- request(
+"https://www.scidb.cn/api/gin-sdb-filetree/public/file/childrenFileListByPath"
+) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies,
+'Origin' = "https://www.scidb.cn",
+'Referer' = paste0("https://www.scidb.cn/en/detail?dataSetId=", datasetID)
+) |>
+req_body_json(
+list(
+dataSetId = datasetID,
+lastIndex = 0,
+pageSize = 2000,
+path = path,
+version = ver
+)
+) |>
+req_perform()
+# Error handling: NO data found, maybe website down, try again later
+top_level_files <- resp_body_json(sub_response)$data
+all_files <- list()
+# Recursion: R creates a brand new, independent copy of function while original copy wait for new copy to finish before resuming
+for (file in top_level_files){
+# Is this item a folder? (Yes)
+if (isTRUE(file$dir)){
+# Pause, launch a new request with subfolder path, and discover a list of files
+nested_files <- get_terminal_files(file$path)
+# Merge discovered files into master list
+all_files <- c(all_files, nested_files)
+# Is this item a folder? (No)
+} else {
+# Append sub-list containing datafile info
+all_files[[length(all_files) + 1]] <- list(
+file_id = file$id,
+file_path = file$path,
+file_name = file$fileName
+)
+}
+}
+return(all_files)
+}
+datafiles_info <- get_terminal_files(current_path)
+View(datafiles_info)
+View(datafiles_info)
+user_path <- "~/Desktop"
+num_datafiles <- character(length(datafiles_info))
+rename <- function(destination_path){
+if(!file.exists(destination_path)){
+return(destination_path)
+}
+dir_name <- dirname(destination_path)
+file_name <- basename(destination_path)
+extension <- tools::file_ext(file_name)
+extension_str <- if(nzchar(extension)) paste0(".", extension) else ""
+base_name <- tools::file_path_sans_ext(file_name)
+counter <- 1
+while (file.exists(destination_path)){
+new_name <- sprintf("%s(%d)%s", base_name, counter, extension_str)
+destination_path <- file.path(dir_name, new_name)
+counter <- counter+1
+}
+message(sprintf("File already exists. Saving as: %s", basename(destination_path)))
+return(destination_path)
+}
+for (i in seq_along(datafiles_info)){
+current_file <- datafiles_info[[i]]
+target_path <- file.path(user_path, current_file$file_name)
+destination <- rename(target_path)
+download_res <- request("https://download.scidb.cn/download") |>
+req_url_query(
+fileId = current_file$file_id,
+path = current_file$file_path,
+fileName = current_file$file_name
+) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies,
+'Origin' = "https://www.scidb.cn",
+'Referer' = paste0("https://www.scidb.cn/en/detail?dataSetId=", datasetID)
+)|>
+req_timeout(3600) |>
+req_perform(path = destination)
+Sys.sleep(1)
+}
+for (i in seq_along(datafiles_info)){
+current_file <- datafiles_info[[i]]
+target_path <- file.path(user_path, current_file$file_name)
+destination <- rename(target_path)
+download_res <- request("https://download.scidb.cn/download") |>
+req_url_query(
+fileId = current_file$file_id,
+path = current_file$file_path,
+fileName = current_file$file_name
+) |>
+req_headers(
+'User-Agent' = user_agent,
+'Cookie' = joint_cookies,
+'Origin' = "https://www.scidb.cn",
+'Referer' = paste0("https://www.scidb.cn/en/detail?dataSetId=", datasetID)
+)|>
+req_timeout(3600) |>
+req_perform(path = destination)
+Sys.sleep(1)
+}
+View(data)
+sdb_download("10.57760/sciencedb.31838", user_path = "~/Desktop")
+sdb_download("10.57760/sciencedb.31838", user_path = "~/Desktop")
+sdb_download("10.57760/sciencedb.31838", user_path = "~/Desktop")
+load_all()
+sdb_download("10.57760/sciencedb.31838", user_path = "~/Desktop")
+use_git()
+use_git_config(user.name = "Jenny Xu", user.email = "jennyyzxu@gmail.com")
+use_git()
+load("~/Documents/sciencedb/.RData")
+data <- load("~/Documents/sciencedb/.RData")
+usethis::use_github()
+usethis::gh_token_help()
+usethis::create_github_token()
+gitcreds::gitcreds_set()
+usethis::use_github()
+usethis::use_readme_rmd()
+load_all()
+library(devtools)
+load_all()
+library(sciencedb)
+library(sciencedb)
+# Search for datasets related to climate change
+results <- sdb_search(keyword = "climate change")
+head(results)
+View(results)
+# Retreive full metadata and file information for a specific dataset
+info <- sdb_dive(doi = "10.57760/sciencedb.07816")
+load_all()
+# Retreive full metadata and file information for a specific dataset
+info <- sdb_dive(doi = "10.57760/sciencedb.07816")
+View(info)
+results <- sdb_search(keyword = "climate")
+View(results)
+results <- sdb_search(keyword = "climate change")
+View(results)
+results <- sdb_search()
+View(results)
+load_all()
+sdb_search()
+results <- sdb_search()
+View(results)
+keyword = "climate change"
+utils::URLencode(keyword, reserved = TRUE)
+load_all()
+results <- sdb_search(keyword = "climate change")
+View(results)
+View(results)
+head(results)
+View(results)
+# Search for datasets related to climate change
+results <- sdb_search(keyword = "attachment")
+head(results)
+View(results)
+sdb_download("10.57760/sciencedb.35781", user_path = "~/Desktop")
+sdb_download("10.57760/sciencedb.o00115.00098", user_path = "~/Desktop")
+# Retreive full metadata and file information for a specific dataset
+info <- sdb_dive(doi = "10.57760/sciencedb.07816")
+View(info)
+# Retreive full metadata and file information for a specific dataset
+info <- sdb_dive(doi = "10.57760/sciencedb.07816")
+# Inspect returned version list and file structures
+str(info)
+info[[1]]$author
+info[[1]]$taxonomy
+build_readme()
+pack::local_install_dev_deps()
+pak::local_install_dev_deps()
+build_readme()
+build_readme()

@@ -13,5 +13,5 @@ Imports:
 Suggests: 
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
-URL: https://github.com/jennyyzxu/sciencedb
+URL: https://github.com/jennyyzxu/sciencedb, https://jennyyzxu.github.io/sciencedb/
 BugReports: https://github.com/jennyyzxu/sciencedb/issues

@@ -37,13 +37,12 @@ library(sciencedb)
 
 1.  **Search for Datasets**
 
-    Use
-    [`sdb_search()`](https://jennyyzxu.github.io/sciencedb/reference/sdb_search.md)
-    to discover datasets using keywords. Because queries return deep
-    multi-column metadata, fetching queries across thousands of records
-    can take 15 to 30 seconds depending on network latency. The function
-    returns a cleaned data frame where each row represents a dataset and
-    includes 12 metadata attributes:
+    Use [`sdb_search()`](reference/sdb_search.md) to discover datasets
+    using keywords. Because queries return deep multi-column metadata,
+    fetching queries across thousands of records can take 15 to 30
+    seconds depending on network latency. The function returns a cleaned
+    data frame where each row represents a dataset and includes 12
+    metadata attributes:
 
     | **Column** | **Description** |
     |----|----|
@@ -121,9 +120,8 @@ head(results)
 2.  **Inspect Dataset Details**
 
     Once a dataset or DOI of inerest is identified from the search
-    results, use
-    [`sdb_dive()`](https://jennyyzxu.github.io/sciencedb/reference/sdb_dive.md)
-    to pull full file lists, directory hierarchies, and version details:
+    results, use [`sdb_dive()`](reference/sdb_dive.md) to pull full file
+    lists, directory hierarchies, and version details:
 
 ``` r
 
@@ -178,10 +176,9 @@ info[[1]]$papers
 
 3.  **Download Files**
 
-    Use
-    [`sdb_download()`](https://jennyyzxu.github.io/sciencedb/reference/sdb_download.md)
-    to download dataset files to your local directory. The function
-    automatically rename files (e.g., data(1).csv) if duplicates exist:
+    Use [`sdb_download()`](reference/sdb_download.md) to download
+    dataset files to your local directory. The function automatically
+    rename files (e.g., data(1).csv) if duplicates exist:
 
 ``` r
 
@@ -201,10 +198,9 @@ sdb_download(
 
 ## All functions
 
-- [`sdb_dive()`](https://jennyyzxu.github.io/sciencedb/reference/sdb_dive.md)
-  : Retrieve Rich Raw Metadata for a ScienceDB Dataset
-- [`sdb_download()`](https://jennyyzxu.github.io/sciencedb/reference/sdb_download.md)
-  : Download All Dataset Files to Local Directory by DOI
-- [`sdb_search()`](https://jennyyzxu.github.io/sciencedb/reference/sdb_search.md)
-  : Search ScienceDB Datasets by Keyword
+- [`sdb_dive()`](sdb_dive.md) : Retrieve Rich Raw Metadata for a
+  ScienceDB Dataset
+- [`sdb_download()`](sdb_download.md) : Download All Dataset Files to
+  Local Directory by DOI
+- [`sdb_search()`](sdb_search.md) : Search ScienceDB Datasets by Keyword
 

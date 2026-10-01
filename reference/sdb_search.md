@@ -7,7 +7,7 @@ of dataset metadata.
 ## Usage
 
 ``` r
-sdb_search(keyword = NULL)
+sdb_search(keyword = "")
 ```
 
 ## Arguments

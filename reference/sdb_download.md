@@ -22,7 +22,8 @@ sdb_download(doi, user_path)
 
 ## Value
 
-Invisible. Files are saved directly to the specified user path.
+Messages informing users the number of files saved successfully to the
+specified user path.
 
 ## Examples
 

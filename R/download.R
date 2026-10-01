@@ -14,7 +14,7 @@
 #'              user_path = "~/Desktop")
 #' }
 
-sdb_download <- function(doi, user_path){
+sdb_download <- function(doi, user_path = "~"){
   # =========================================================================
   # Step 1: Check Cookies
   # =========================================================================

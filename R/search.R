@@ -31,68 +31,24 @@
 
 sdb_search <- function(keyword = ""){
   # =========================================================================
-  # Step 1: Check Cookies
-  # =========================================================================
-  user_agent <- "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36"
-
-  initial_response <- httr2::request("https://www.scidb.cn/en") |>
-    httr2::req_headers(
-      'User-Agent' = user_agent,
-      'Accept' = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-      'Accept-Language' = "en"
-    ) |>
-    httr2::req_perform()
-
-  # =========================================================================
-  # Step 2: Extract Cookies
-  # =========================================================================
-  # (ACW) Application Control Web Traffic Cookie: basic firewall session
-  acw_cookies <- initial_response[["headers"]][[3]]
-  acw <- sub(";.*$", "", acw_cookies)
-
-  # (CDN) Content Delivery Network Security Traffic Cookie: authorize high-bandwidth data transfers
-  cdn_cookies <- initial_response[["headers"]][[4]]
-  cdn <- sub(";.*$", "", cdn_cookies)
-
-  joint_cookies <- paste(acw, cdn, sep = "; ")
-
-  # =========================================================================
-  # Step 3: Search keyword
+  # Step 1,2,3: Cookies Extraction in Internal Helper
   # =========================================================================
   if(is.null(keyword) || trimws(keyword) == ""){
     keyword = ""
   } else{
-    keyword = utils::URLencode(keyword, reserved = TRUE)
+    if (
+      !is.character(keyword) ||
+      length(keyword) != 1L ||
+      is.na(keyword)
+    ){
+      stop(
+        "Invalid keyword. Keyword must be NULL or a single, non-missing character string."
+      )
+    }
+    keyword = trimws(keyword)
   }
 
-  search_response <- httr2::request("https://www.scidb.cn/api/sdb-query-service/query") |>
-    httr2::req_url_query(
-      queryCode = "",
-      q = keyword
-    ) |>
-    httr2::req_headers(
-      'User-Agent' = user_agent,
-      'Cookie' = joint_cookies,
-      'Origin' = "https://www.scidb.cn",
-      'Referer' = "https://www.scidb.cn/en/list",
-      'Content-Type' = "application/json;charset=UTF-8"
-    ) |>
-    httr2::req_body_json(list(
-      copyrightCode=list(),
-      dataSetStatus=list(),
-      fileType=list(),
-      journalNameEn=list(),
-      ordernum="6",
-      page = 1,
-      publishDate=list(),
-      ror="",
-      rorId=list(),
-      size= 10000,
-      taxonomyEn=list()
-    ))|>
-    httr2::req_perform()
-
-  json <- httr2::resp_body_json(search_response)
+  json <- sdb_search_internal(keyword)
   final_datasets <- json$data$data
 
   # =========================================================================
@@ -140,7 +96,7 @@ sdb_search <- function(keyword = ""){
     }, FUN.VALUE = character(1)
     )}
 
-  ## Define a final data frame by extracting name column from matching datasets
+  ## Define a final data frame by extracting name column from datasets
   dataset.names <- data.frame(
     Title = extract(final_datasets, "titleEn", optional_field = "titleZh"),
     Author = extract(final_datasets, "author", sub_key = "nameEn"),

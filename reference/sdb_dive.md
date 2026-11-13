@@ -7,29 +7,32 @@ author details, file structures, licenses, and internal identifiers.
 ## Usage
 
 ``` r
-sdb_dive(doi)
+sdb_dive(doi, raw = FALSE)
 ```
 
 ## Arguments
 
 - doi:
 
-  A character string specifying the DOI (e.g.,
-  "10.57760/sciencedb.15594").
+  A character string specifying the DOI.
+
+- raw:
+
+  Default is false, which returned a cleaned dataframe.
 
 ## Value
 
-A nested list containing the full API metadata response directly from
-ScienceDB's backend service.
+A nested list containing the full API metadata response.
 
 ## Examples
 
 ``` r
 if (FALSE) { # \dontrun{
-# Fetch complete rwa metadata for a dataset
-raw_info <- sdb_dive("10.57760/sciencedb.15594")
+# Fetch complete raw metadata for a dataset
+raw_info <- sdb_dive(doi = "10.57760/sciencedb.15594", raw = TRUE)
 
 # Access raw backend elements
 id <- raw_info[[1]]$id
-access <- raw_info[[1]]$shareStatus} # }
+access <- raw_info[[1]]$shareStatus
+} # }
 ```

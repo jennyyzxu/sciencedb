@@ -7,16 +7,14 @@ of dataset metadata.
 ## Usage
 
 ``` r
-sdb_search(keyword = "")
+sdb_search(keyword)
 ```
 
 ## Arguments
 
 - keyword:
 
-  A character string specifying the search query or topic (e.g.,
-  'personality', 'economics'). Default is 'NULL', which returns top
-  default results.
+  A non-empty character string specifying the search query.
 
 ## Value
 
@@ -24,8 +22,7 @@ A data frame containing the following columns:
 
 - Title:
 
-  English dataset title (falls back to Chinese title if English is
-  missing).
+  English dataset title (Chinese title if English is missing).
 
 - Author:
 

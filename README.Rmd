@@ -20,6 +20,7 @@ knitr::opts_chunk$set(
 
 <!-- badges: start -->
 
+[![Codecov test coverage](https://codecov.io/gh/jennyyzxu/sciencedb/graph/badge.svg)](https://app.codecov.io/gh/jennyyzxu/sciencedb)
 <!-- badges: end -->
 
 The goal of **sciencedb** is to provide a user-friendly, programmatic R

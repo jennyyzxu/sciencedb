@@ -4,15 +4,15 @@
 \alias{sdb_search}
 \title{Search ScienceDB Datasets by Keyword}
 \usage{
-sdb_search(keyword = "")
+sdb_search(keyword)
 }
 \arguments{
-\item{keyword}{A character string specifying the search query or topic (e.g., 'personality', 'economics'). Default is 'NULL', which returns top default results.}
+\item{keyword}{A non-empty character string specifying the search query.}
 }
 \value{
 A data frame containing the following columns:
 \describe{
-\item{Title}{English dataset title (falls back to Chinese title if English is missing).}
+\item{Title}{English dataset title (Chinese title if English is missing).}
 \item{Author}{Semicolon-separated list of author names.}
 \item{Keyword}{Semicolon-separated list of English keywords.}
 \item{Publish}{Publish date string.}
@@ -26,7 +26,9 @@ A data frame containing the following columns:
 \item{Cstr}{China Science and Technology Resource identifier.}}
 }
 \description{
-Executes a programmatic search against the ScienceDB platform using internal query endpoints. It returns a cleaned and structured data frame of dataset metadata.
+Executes a programmatic search against the ScienceDB platform
+using internal query endpoints.
+It returns a cleaned and structured data frame of dataset metadata.
 }
 \examples{
 \dontrun{

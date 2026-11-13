@@ -1,42 +1,173 @@
-skip("Entire test suite pending meeting updates")
-
 # =========================================================================
 # Happy Paths :)
 # =========================================================================
+# Happy Path 1: Successfuly Integrate all private functions
+test_that("sdb_download saves files in a temporary directory", {
+  ## Prepare variables for what we expect to see (functions/directory path)
+  download <- NULL
+  result <- NULL
 
+  ## Clean up temporary directory after test finishes
+  withr::defer({
+    if (!is.null(result)) {
+      unlink(result, recursive = TRUE)
+    }
+  })
 
+  # Replace private helper functions with mocked responses
+  local_mocked_bindings(
+    .sdb_cookie = function(user_agent) {
+      "test-cookies"
+    },
+    .sdb_datasetid = function(doi, user_agent, joint_cookies) {
+      "test-datasetID"
+    },
+    .sdb_rawinfo = function(dataset_id, user_agent, joint_cookies) {
+      list(
+        list(
+          version = "V1",
+          shareStatus = "PUBLIC"
+        )
+      )
+    },
+    .sdb_filetree = function(user_agent, joint_cookies, dataset_id,
+                             ver, path) {
+      list(
+        list(
+          file_id = "file1",
+          file_path = "/V1/data.csv",
+          file_name = "data.csv"
+        )
+      )
+    },
+    .sdb_download = function(file_id, file_path, file_name,
+                             dataset_id, user_agent, joint_cookies,
+                             destination) {
+      # Update whatever master function passes
+      download <<- list(
+        file_id = file_id,
+        file_path = file_path,
+        file_name = file_name,
+        dataset_id = dataset_id,
+        destination = destination
+      )
+    }
+  )
 
+  expect_message(
+    result <- sdb_download(doi = "test-doi"),
+    "Found 1 file\\(s\\) to download."
+  )
+  expect_true(dir.exists(result))
+  expect_equal(download$file_id, "file1")
+  expect_equal(download$file_path, "/V1/data.csv")
+  expect_equal(download$file_name, "data.csv")
+  expect_equal(download$dataset_id, "test-datasetID")
+  expect_identical(
+    download$destination,
+    file.path(result, "data.csv")
+  )
+})
 
+# Happy Path 2:  zero file
+test_that("sdb_download successfully handle dataset with no file", {
+  local_mocked_bindings(
+    .sdb_cookie = function(user_agent) {
+      "test-cookies"
+    },
+    .sdb_datasetid = function(doi, user_agent, joint_cookies) {
+      "test-datasetID"
+    },
+    .sdb_rawinfo = function(dataset_id, user_agent, joint_cookies) {
+      list(
+        list(
+          version = "V1",
+          shareStatus = "PUBLIC"
+        )
+      )
+    },
+    .sdb_filetree = function(user_agent, joint_cookies, dataset_id,
+                             ver, path) {
+      list()
+    }
+  )
 
+  expect_message(
+    result <- sdb_download(doi = "test-doi"),
+    "No files found to download for this dataset."
+  )
+  expect_null(result)
+})
 
+# Happy Path 3:  RESTRICTED/EMBARGO Datasets
+test_that("sdb_download warns for restricted/embargo share status", {
+  result <- NULL
 
+  ## Clean up temporary directory after test finishes
+  withr::defer({
+    if (!is.null(result)) {
+      unlink(result, recursive = TRUE)
+    }
+  })
 
+  statuses <- c("RESTRICTED", "EMBARGO")
 
+  for (status in statuses) {
+    download <- NULL
 
+    local_mocked_bindings(
+      .sdb_cookie = function(user_agent) {
+        "test-cookies"
+      },
+      .sdb_datasetid = function(doi, user_agent, joint_cookies) {
+        "test-datasetID"
+      },
+      .sdb_rawinfo = function(dataset_id, user_agent, joint_cookies) {
+        list(
+          list(
+            version = "V1",
+            shareStatus = status
+          )
+        )
+      },
+      .sdb_filetree = function(user_agent, joint_cookies, dataset_id,
+                               ver, path) {
+        list(
+          list(
+            file_id = "file1",
+            file_path = "/V1/data.csv",
+            file_name = "data.csv"
+          )
+        )
+      },
+      .sdb_download = function(file_id, file_path, file_name,
+                               dataset_id, user_agent, joint_cookies,
+                               destination) {
+        # capture whatever master function passes
+        download <<- list(
+          file_id = file_id,
+          file_path = file_path,
+          file_name = file_name,
+          dataset_id = dataset_id,
+          destination = destination
+        )
+      }
+    )
 
-
-
-# # Correct Path (Test Output)
-# # Look into file path and check if file path exists
-# # maybe a list of files in paths and check
-# # cache, compare fingerprints
-# test_that("sdb_download returns a character string representing file path", {
-#   file.path <- tempdir()
-#   result <- sdb_download(id = "10.3886/icpsr02760.v18", path = file.path)
-#   expect_equal(result, file.path)
-#   expect_type(result, "character")
-# })
-# 
-# # Wrong Path (Test Input)
-# # Other potential input: A list of DOI
-# # Directory path OR file path
-# # tempfile path?
-# # User should pick the file name so not colliding with existing one
-# # what if file already exists in their files? error, overwrite (but document), warning (but skip)
-# test_that("sdb_download returns an error if invalid input", {
-#   expect_error(sdb_download(id = NULL, path = tempdir()))
-#   expect_error(sdb_download(id = "", path = tempdir()))
-#   expect_error(sdb_download(id = "title", path = tempdir()))
-#   expect_error(sdb_download(id = "10.3886/icpsr02760.v18", path = NULL))
-#   expect_error(sdb_download(id = "10.3886/icpsr02760.v18", path = ""))
-# })
+    expect_message(
+      result <- sdb_download(doi = "test-doi"),
+      paste0(
+        "Notice: this dataset contains restricted or ",
+        "embargoed files. Some downloads may be ",
+        "unavailable."
+      )
+    )
+    expect_true(dir.exists(result))
+    expect_equal(download$file_id, "file1")
+    expect_equal(download$file_name, "data.csv")
+    expect_identical(
+      download$destination,
+      file.path(result, "data.csv")
+    )
+  }
+})

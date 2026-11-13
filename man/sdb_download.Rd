@@ -4,22 +4,20 @@
 \alias{sdb_download}
 \title{Download All Dataset Files to Local Directory by DOI}
 \usage{
-sdb_download(doi, user_path)
+sdb_download(doi)
 }
 \arguments{
-\item{doi}{A character string specifying the DOI (e.g., "10.57760/sciencedb.15594").}
-
-\item{user_path}{A character string specifying the local directory path where downloaded files will be saved.}
+\item{doi}{A character string specifying the DOI.}
 }
 \value{
-Messages informing users the number of files saved successfully to the specified user path.
+The path to the temporary directory with downloaded files.
+Users should copy any files they want before the ending R session.
 }
 \description{
 Download All Dataset Files to Local Directory by DOI
 }
 \examples{
 \dontrun{
-sdb_download(doi = "10.57760/sciencedb.15594",
-             user_path = "~/Desktop")
+sdb_download(doi = "10.57760/sciencedb.15594")
 }
 }
